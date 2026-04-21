@@ -1,0 +1,32 @@
+trigger:
+  branches:
+    include:
+      - main
+
+stages:
+  - stage: Validate
+    jobs:
+      - job: PythonApi
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.11'
+          - script: |
+              cd api
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+              pytest -q
+
+      - job: ReactWeb
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '20.x'
+          - script: |
+              cd web
+              npm ci
+              npm run build
